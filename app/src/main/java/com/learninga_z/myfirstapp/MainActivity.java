@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
 
     private Scaledrone scaledrone;
     private String channelID = "r1hXZk6rrSVHGMa0";
-    private String roomName = "hello-world";
+    private String roomName = "observable-chat";
 
     private MessageAdapter messageAdapter;
     private ListView messagesView;
@@ -91,12 +91,12 @@ public class MainActivity extends AppCompatActivity implements RoomListener {
 
     @Override
     public void onMessage(Room room, final JsonNode json, final Member member) {
-        final ObjectMapper mapper = new ObjectMapper();
-        Log.d(TAG, member.toString());
+        Log.d(TAG, json.toString());
         try {
-            final MemberData data = mapper.treeToValue(member.getClientData(), MemberData.class);
+            ObjectMapper mapper = new ObjectMapper();
+            MemberData memberData = mapper.treeToValue(member.getClientData(), MemberData.class);
             boolean belongsToCurrentUser = member.getId().equals(scaledrone.getClientID());
-            final Message message = new Message(json.asText(), data, belongsToCurrentUser);
+            final Message message = new Message(json.asText(), memberData, belongsToCurrentUser);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
