@@ -10,10 +10,10 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".LoginActivity">
+    tools:context=".CreateAccountActivity">
 
     <ProgressBar
-        android:id="@+id/login_progress"
+        android:id="@+id/register_progress"
         style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,12 +23,12 @@
         app:layout_constraintRight_toRightOf="parent" />
 
     <ScrollView
-        android:id="@+id/login_form"
+        android:id="@+id/register_scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/email_login_form"
+            android:id="@+id/register_form"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/email"
+                    android:id="@+id/register_email"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_email"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/password"
+                    android:id="@+id/register_password"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/prompt_password"
@@ -66,24 +66,42 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/register_confirm_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/prompt_confirm_password"
+                    android:imeActionId="6"
+                    android:imeActionLabel="@string/action_sign_in_short"
+                    android:imeOptions="actionUnspecified"
+                    android:inputType="textPassword"
+                    android:maxLines="1"
+                    android:singleLine="true" />
+
+            </android.support.design.widget.TextInputLayout>
+
             <Button
-                android:id="@+id/sign_in_action_button"
+                android:id="@+id/register_action_button"
                 style="?android:textAppearanceSmall"
                 android:backgroundTint="@color/colorPrimary"
                 android:textColor="#fff"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="@string/action_sign_in"
+                android:text="@string/action_register"
                 android:textStyle="bold" />
 
             <Button
-                android:id="@+id/go_to_register_button"
+                android:id="@+id/go_to_sign_in_button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="@string/action_register"
+                android:text="@string/action_sign_in"
                 android:textStyle="bold" />
 
         </LinearLayout>

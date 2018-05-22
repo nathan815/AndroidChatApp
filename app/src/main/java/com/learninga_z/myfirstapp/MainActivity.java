@@ -30,10 +30,15 @@ public class MainActivity extends Activity {
         Log.d(TAG, "Main activity started");
 
         auth = FirebaseAuth.getInstance();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
 
         boolean logout = getIntent().getBooleanExtra("logout", false);
         if(logout) {
-            Log.d(TAG, "Logging out");
+            Log.v(TAG, "logout:start");
             auth.signOut();
         }
 

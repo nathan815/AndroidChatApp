@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dip"
+    android:paddingTop="10dip"
+    android:paddingBottom="10dip" >
+
+    <TextView
+        android:id="@+id/convo_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conversation name"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/convo_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Conversation last message"
+        android:textSize="14sp"
+        android:layout_below="@+id/convo_name" />
+</RelativeLayout>

@@ -10,16 +10,12 @@ import android.widget.ListView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.scaledrone.lib.Listener;
 import com.scaledrone.lib.Member;
 import com.scaledrone.lib.Room;
 import com.scaledrone.lib.RoomListener;
 import com.scaledrone.lib.Scaledrone;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
 public class ConversationActivity extends AppCompatActivity implements RoomListener {
@@ -79,14 +75,6 @@ public class ConversationActivity extends AppCompatActivity implements RoomListe
         if(message.length() > 0) {
             scaledrone.publish(roomName, message);
             sendMessageText.getText().clear();
-
-            DatabaseReference database = FirebaseDatabase.getInstance().getReference();
-            DatabaseReference ref = database.child("messages").push();
-            Map<String, String> msg = new HashMap<>();
-            msg.put("text", message);
-            ref.setValue(msg);
-
-
         }
 
         Log.d(TAG, "Message sent: " + message);
