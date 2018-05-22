@@ -1,6 +1,9 @@
 
 # Created by https://www.gitignore.io/api/androidstudio
 
+# Firebase config
+app/google-services.json
+
 ### AndroidStudio ###
 # Covers files to be ignored for android development using Android Studio.
 
@@ -63,6 +66,7 @@ obj/
 /out/
 
 # User-specific configurations
+.idea/assetWizardSettings.xml
 .idea/caches/
 .idea/dictionaries/
 .idea/libraries/
