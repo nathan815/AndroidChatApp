@@ -1,13 +1,15 @@
-package com.learninga_z.myfirstapp;
+package com.learninga_z.myfirstapp.activities;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.learninga_z.myfirstapp.R;
+import com.learninga_z.myfirstapp.activities.ConversationListActivity;
+import com.learninga_z.myfirstapp.activities.LoginActivity;
 
 public class MainActivity extends Activity {
 

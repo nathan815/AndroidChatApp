@@ -1,4 +1,4 @@
-package com.learninga_z.myfirstapp;
+package com.learninga_z.myfirstapp.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +10,10 @@ import android.widget.ListView;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.learninga_z.myfirstapp.MemberData;
+import com.learninga_z.myfirstapp.Message;
+import com.learninga_z.myfirstapp.MessageAdapter;
+import com.learninga_z.myfirstapp.R;
 import com.scaledrone.lib.Listener;
 import com.scaledrone.lib.Member;
 import com.scaledrone.lib.Room;

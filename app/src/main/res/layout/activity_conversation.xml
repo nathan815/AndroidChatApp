@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#eee"
-    tools:context=".ConversationActivity"
+    tools:context=".activities.ConversationActivity"
     tools:layout_editor_absoluteY="81dp">
 
     <ListView
@@ -26,7 +26,7 @@
         android:background="#fff"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        tools:context=".MainActivity"
+        tools:context=".activities.MainActivity"
         tools:layout_editor_absoluteY="81dp"
         app:layout_constraintBottom_toBottomOf="parent">
 

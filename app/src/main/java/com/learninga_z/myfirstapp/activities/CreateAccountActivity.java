@@ -1,4 +1,4 @@
-package com.learninga_z.myfirstapp;
+package com.learninga_z.myfirstapp.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,6 +18,8 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.learninga_z.myfirstapp.AppConstants;
+import com.learninga_z.myfirstapp.R;
 
 public class CreateAccountActivity extends AppCompatActivity {
     private static final String TAG = "CreateAccountActivity";
