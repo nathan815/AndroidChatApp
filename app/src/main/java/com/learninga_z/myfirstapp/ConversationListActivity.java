@@ -2,6 +2,8 @@ package com.learninga_z.myfirstapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,12 +23,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.FirebaseFirestoreSettings;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.learninga_z.myfirstapp.models.Conversation;
 
@@ -38,11 +42,14 @@ public class ConversationListActivity extends AppCompatActivity {
     private static final String TAG = "ConversationList";
 
     FirebaseAuth auth;
-    FirebaseUser user;
+    FirebaseUser currentUser;
     FirebaseFirestore db;
 
     ListView listView;
     private List<Conversation> convoList;
+
+    private CollectionReference conversationsRef;
+    private ListenerRegistration conversationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,14 +61,17 @@ public class ConversationListActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         auth = FirebaseAuth.getInstance();
-        user = auth.getCurrentUser();
+        currentUser = auth.getCurrentUser();
 
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        db.setFirestoreSettings(settings);
+        conversationsRef = db.collection("conversations");
 
         listenForConversations();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        conversationListener.remove();
     }
 
     @Override
@@ -87,20 +97,19 @@ public class ConversationListActivity extends AppCompatActivity {
     }
 
     private void listenForConversations() {
-        db.collection("conversations").orderBy("createdOn")
-          .addSnapshotListener(new EventListener<QuerySnapshot>() {
+        conversationListener = conversationsRef.orderBy("createdOn").addSnapshotListener(new EventListener<QuerySnapshot>() {
                 @Override
                 public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                    convoList.clear();
-                    for (DocumentSnapshot snapshot : documentSnapshots){
-                        Conversation convo = snapshot.toObject(Conversation.class);
-                        convoList.add(convo);
-                    }
-                    CustomAdapter adapter = new CustomAdapter(getApplicationContext(), android.R.layout.simple_selectable_list_item, convoList);
-                    adapter.notifyDataSetChanged();
-                    listView.setAdapter(adapter);
-                }
-            });
+            convoList.clear();
+            for (DocumentSnapshot snapshot : documentSnapshots){
+                Conversation convo = snapshot.toObject(Conversation.class);
+                convoList.add(convo);
+            }
+            ConversationListAdapter adapter = new ConversationListAdapter(getApplicationContext(), android.R.layout.simple_selectable_list_item, convoList);
+            adapter.notifyDataSetChanged();
+            listView.setAdapter(adapter);
+            }
+        });
     }
 
     private void logout() {
@@ -112,11 +121,11 @@ public class ConversationListActivity extends AppCompatActivity {
     }
 
     private void newConversation() {
-        Conversation convo = new Conversation(user.getUid(), "other");
-        DocumentReference ref = db.collection("conversations").document();
-        convo.conversationId = ref.getId();
+        DocumentReference document = conversationsRef.document();
+        Conversation conversation = new Conversation(document.getId());
+        conversation.users.put(currentUser.getUid(), true);
 
-        ref.set(convo)
+        document.set(conversation)
             .addOnSuccessListener(new OnSuccessListener<Void>() {
                  @Override
                 public void onSuccess(Void aVoid) {
@@ -133,38 +142,43 @@ public class ConversationListActivity extends AppCompatActivity {
 
 }
 
-class CustomAdapter extends ArrayAdapter<Conversation> {
+class ConversationListAdapter extends ArrayAdapter<Conversation> {
 
-    public CustomAdapter(Context context, int textViewResourceId) {
+    public ConversationListAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
     }
 
-    public CustomAdapter(Context context, int resource, List<Conversation> items) {
+    public ConversationListAdapter(Context context, int resource, List<Conversation> items) {
         super(context, resource, items);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        View v = convertView;
+        View view = convertView;
 
-        if (v == null) {
-            LayoutInflater vi;
-            vi = LayoutInflater.from(getContext());
-            v = vi.inflate(R.layout.conversation_list_row, null);
+        if (view == null) {
+            LayoutInflater vi = LayoutInflater.from(getContext());
+            view = vi.inflate(R.layout.conversation_list_row, null);
         }
 
-        Conversation c = getItem(position);
+        Conversation conversation = getItem(position);
 
-        if (c != null) {
-            TextView name = (TextView) v.findViewById(R.id.convo_name);
-            TextView text = (TextView) v.findViewById(R.id.convo_text);
+        if (conversation != null) {
+            TextView name = (TextView) view.findViewById(R.id.convo_name);
+            TextView text = (TextView) view.findViewById(R.id.convo_text);
+            View colorCircle = view.findViewById(R.id.convo_color);
+            GradientDrawable colorCircleBg = (GradientDrawable) colorCircle.getBackground();
 
-            name.setText(TextUtils.isEmpty(c.name) ? c.conversationId : c.name);
-            text.setText(TextUtils.isEmpty(c.latestMessage) ? "No messages yet." : c.latestMessage);
+            if(conversation.color != null) {
+                colorCircleBg.setColor(Color.parseColor(conversation.color));
+            }
+
+            name.setText(TextUtils.isEmpty(conversation.name) ? conversation.conversationId : conversation.name);
+            text.setText(TextUtils.isEmpty(conversation.latestMessage) ? "No messages yet." : conversation.latestMessage);
         }
 
-        return v;
+        return view;
     }
 
 }

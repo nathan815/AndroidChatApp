@@ -6,19 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".ConversationListActivity">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
-        android:textSize="20dp"
-        android:padding="10dp"
-        android:text="Conversation List" />
-
     <ListView
         android:id="@+id/convo_list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/text" />
+        android:layout_height="wrap_content" />
 
 </android.support.constraint.ConstraintLayout>

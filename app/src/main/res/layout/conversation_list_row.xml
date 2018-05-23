@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
+<android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="10dip"
-    android:paddingTop="10dip"
-    android:paddingBottom="10dip" >
+    android:paddingLeft="15dip"
+    android:paddingTop="15dip"
+    android:paddingBottom="15dip" >
+
+    <View
+        android:id="@+id/convo_color"
+        android:layout_alignParentLeft="true"
+        android:scaleType="centerInside"
+        android:background="@drawable/circle"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
     <TextView
         android:id="@+id/convo_name"
@@ -14,7 +24,9 @@
         android:layout_height="wrap_content"
         android:text="Conversation name"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintLeft_toRightOf="@+id/convo_color" />
 
     <TextView
         android:id="@+id/convo_text"
@@ -22,5 +34,8 @@
         android:layout_height="wrap_content"
         android:text="Conversation last message"
         android:textSize="14sp"
-        android:layout_below="@+id/convo_name" />
-</RelativeLayout>
+        android:layout_below="@+id/convo_name"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/convo_name"
+        app:layout_constraintLeft_toRightOf="@+id/convo_color" />
+</android.support.constraint.ConstraintLayout>

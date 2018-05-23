@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -14,6 +15,7 @@ public class MainActivity extends Activity {
 
 
     private FirebaseAuth auth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +27,6 @@ public class MainActivity extends Activity {
         }
 
         setContentView(R.layout.activity_main);
-        //SharedPreferences prefs = this.getSharedPreferences("com.learninga_z.myfirstapp", Context.MODE_PRIVATE);
 
         Log.d(TAG, "Main activity started");
 
