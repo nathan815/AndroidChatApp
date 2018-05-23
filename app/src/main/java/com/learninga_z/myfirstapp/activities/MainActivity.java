@@ -41,24 +41,26 @@ public class MainActivity extends Activity {
 
         boolean logout = getIntent().getBooleanExtra("logout", false);
         if(logout) {
-            Log.v(TAG, "logout:start");
+            Log.d(TAG, "logout:start");
             auth.signOut();
+            Log.d(TAG, "logout:done");
         }
 
         FirebaseUser currentUser = auth.getCurrentUser();
-        Intent i;
+        Intent intent;
         if(currentUser == null) {
-            i = new Intent(this, LoginActivity.class);
+            intent = new Intent(this, LoginActivity.class);
         }
         else {
-            i = new Intent(this, ConversationListActivity.class);
+            intent = new Intent(this, ConversationListActivity.class);
         }
 
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        Log.d(TAG, "Starting activity: " + i.toString());
+        Log.d(TAG, "Starting activity: " + intent.toString());
 
-        startActivity(i);
+        startActivity(intent);
+        overridePendingTransition(0,0);
         finish();
     }
 

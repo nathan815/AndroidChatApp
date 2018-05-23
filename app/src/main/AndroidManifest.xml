@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".ChatApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -29,12 +30,16 @@
         <activity
             android:name=".activities.ConversationListActivity"
             android:label="My Conversations" />
-
         <activity android:name=".activities.ConversationActivity" />
 
         <activity
             android:name=".activities.CreateAccountActivity"
             android:label="@string/title_activity_register" />
+
+        <activity
+            android:name=".activities.NewConversationActivity"
+            android:label="@string/title_activity_new_conversation"
+            android:parentActivityName=".activities.ConversationListActivity"/>
     </application>
 
 </manifest>

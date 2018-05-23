@@ -116,14 +116,13 @@ public class LoginActivity extends AppCompatActivity {
             .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                 @Override
                 public void onComplete(@NonNull Task<AuthResult> task) {
-                    showProgress(false);
-                    loggingIn = false;
-
                     if (task.isSuccessful()) {
                         Log.v(TAG, "login:success");
                         loginSuccess();
                     }
                     else {
+                        showProgress(false);
+                        loggingIn = false;
                         Log.v(TAG, "login:failure", task.getException());
                         loginError();
                     }
