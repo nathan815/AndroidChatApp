@@ -29,7 +29,7 @@
         android:background="#fff"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
-        tools:context=".activities.MainActivity"
+        tools:context=".activities.LauncherActivity"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <EditText

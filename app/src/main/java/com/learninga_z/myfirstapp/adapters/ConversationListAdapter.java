@@ -5,7 +5,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +15,9 @@ import com.learninga_z.myfirstapp.R;
 import com.learninga_z.myfirstapp.models.Conversation;
 
 import java.text.DateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class ConversationListAdapter extends ArrayAdapter<Conversation> {
-
-    private Timer timer;
 
     public ConversationListAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);

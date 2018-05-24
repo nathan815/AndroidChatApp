@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -29,8 +28,8 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.learninga_z.myfirstapp.adapters.MessageAdapter;
 import com.learninga_z.myfirstapp.R;
+import com.learninga_z.myfirstapp.adapters.MessageAdapter;
 import com.learninga_z.myfirstapp.models.Conversation;
 import com.learninga_z.myfirstapp.models.Message;
 import com.learninga_z.myfirstapp.models.User;
@@ -97,9 +96,7 @@ public class ConversationActivity extends AppCompatActivity {
         messagesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                sendMessageText.clearFocus();
-                InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
+                hideKeybooard();
             }
         });
 
@@ -117,6 +114,12 @@ public class ConversationActivity extends AppCompatActivity {
         super.onStop();
         conversationListener.remove();
         messageListener.remove();
+    }
+
+    private void hideKeybooard() {
+        sendMessageText.clearFocus();
+        InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
     }
 
     private void listenForConversationInfo() {
@@ -148,7 +151,8 @@ public class ConversationActivity extends AppCompatActivity {
                         userMap.put(userId, user);
 
                         // notify the message adapter
-                        messageAdapter.notifyDataSetChanged();
+                        if(messageAdapter != null)
+                            messageAdapter.notifyDataSetChanged();
                     }
                     else {
                         Log.d(TAG, "No such user " + userId);
@@ -205,25 +209,5 @@ public class ConversationActivity extends AppCompatActivity {
                 });
         }
     }
-
-//    @Override
-//    public void onMessage(Room room, final JsonNode json, final Member member) {
-//        Log.d(TAG, json.toString());
-//        try {
-//            ObjectMapper mapper = new ObjectMapper();
-//            MemberData memberData = mapper.treeToValue(member.getClientData(), MemberData.class);
-//            boolean belongsToCurrentUser = member.getId().equals(scaledrone.getClientID());
-//            final Message message = new Message(json.asText(), memberData, belongsToCurrentUser);
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    messageAdapter.add(message);
-//                    messagesView.setSelection(messagesView.getCount() - 1);
-//                }
-//            });
-//        } catch (JsonProcessingException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
 }

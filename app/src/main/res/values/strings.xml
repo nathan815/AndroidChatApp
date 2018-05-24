@@ -6,6 +6,18 @@
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_register">Create an account</string>
 
+    <!-- Navigation Drawer Items -->
+    <string name="nav_item_conversation_list">My Conversations</string>
+    <string name="nav_item_users">Users</string>
+    <string name="nav_item_settings">Settings</string>
+
+    <!-- Toolbar titles when navigation menu item is selected -->
+    <string-array name="nav_item_activity_titles">
+        <item>My Conversations</item>
+        <item>Users</item>
+        <item>Settings</item>
+    </string-array>
+
     <!-- Menus -->
     <string name="menu_new_convo">New Conversation</string>
     <string name="menu_settings">Settings</string>
@@ -27,7 +39,17 @@
     <string name="error_email_exists">This email is already registered.</string>
     <string name="error_register_failed">Unable to create account.</string>
 
-    <string name="title_activity_new_conversation">New conversation</string>
-    <string name="new_convo_name_hint">Conversation name</string>
+    <!-- New conversation view strings -->
+    <string name="title_activity_new_conversation">New Conversation</string>
+    <string name="new_convo_name_hint">Conversation Name</string>
     <string name="new_convo_create">Create Conversation</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
 </resources>
