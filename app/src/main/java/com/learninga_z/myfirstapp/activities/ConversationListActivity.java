@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -62,11 +63,23 @@ public class ConversationListActivity extends AppCompatActivity {
 
         conversationsRef = db.collection("conversations");
 
+        registerListViewClickHandler();
+    }
+
+    private void registerListViewClickHandler() {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                                    long id) {
+                Conversation conversation = convoList.get(position);
+                openConversation(conversation);
+            }
+        });
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        super.onStop();
         conversationListener.remove();
     }
 
@@ -97,6 +110,13 @@ public class ConversationListActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void openConversation(Conversation conversation) {
+        Intent intent = new Intent(ConversationListActivity.this, ConversationActivity.class);
+        intent.putExtra("conversation_id", conversation.conversationId);
+        intent.putExtra("conversation_name", conversation.name);
+        startActivity(intent);
     }
 
     private void listenForConversations() {

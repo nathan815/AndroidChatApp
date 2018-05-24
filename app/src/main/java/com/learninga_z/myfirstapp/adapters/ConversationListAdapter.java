@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.text.TextUtils;
+import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +15,15 @@ import android.widget.TextView;
 import com.learninga_z.myfirstapp.R;
 import com.learninga_z.myfirstapp.models.Conversation;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ConversationListAdapter extends ArrayAdapter<Conversation> {
+
+    private Timer timer;
 
     public ConversationListAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -45,6 +53,12 @@ public class ConversationListAdapter extends ArrayAdapter<Conversation> {
 
             View colorCircle = view.findViewById(R.id.convo_color);
             GradientDrawable colorCircleBg = (GradientDrawable) colorCircle.getBackground();
+
+            long milliseconds = conversation.updatedOn.getSeconds() * 1000;
+            CharSequence date = DateUtils.formatSameDayTime(milliseconds, System.currentTimeMillis(), DateFormat.SHORT, DateFormat.SHORT);
+
+            TextView timeView = view.findViewById(R.id.convo_time);
+            timeView.setText(date);
 
             if(conversation.color != null) {
                 colorCircleBg.setColor(Color.parseColor(conversation.color));

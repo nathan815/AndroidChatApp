@@ -30,7 +30,14 @@
         <activity
             android:name=".activities.ConversationListActivity"
             android:label="My Conversations" />
-        <activity android:name=".activities.ConversationActivity" />
+
+        <activity
+            android:name=".activities.ConversationActivity"
+            android:parentActivityName=".activities.ConversationListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ConversationListActivity" />
+        </activity>
 
         <activity
             android:name=".activities.CreateAccountActivity"
@@ -39,7 +46,11 @@
         <activity
             android:name=".activities.NewConversationActivity"
             android:label="@string/title_activity_new_conversation"
-            android:parentActivityName=".activities.ConversationListActivity"/>
+            android:parentActivityName=".activities.ConversationListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.ConversationListActivity" />
+        </activity>
     </application>
 
 </manifest>

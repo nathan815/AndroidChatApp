@@ -5,9 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="15dip"
-    android:paddingTop="15dip"
-    android:paddingBottom="15dip" >
+    android:padding="15dip" >
 
     <View
         android:id="@+id/convo_color"
@@ -22,17 +20,26 @@
         android:id="@+id/convo_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Conversation name"
+        android:text="Conversation Name"
         android:textSize="16sp"
         android:textStyle="bold"
         android:layout_marginLeft="10dp"
         app:layout_constraintLeft_toRightOf="@+id/convo_color" />
 
     <TextView
+        android:id="@+id/convo_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="[time]"
+        android:textSize="14sp"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <TextView
         android:id="@+id/convo_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Conversation last message"
+        android:text="The last message here"
         android:textSize="14sp"
         android:layout_below="@+id/convo_name"
         android:layout_marginLeft="10dp"

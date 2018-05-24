@@ -1,30 +1,41 @@
-package com.learninga_z.myfirstapp;
+package com.learninga_z.myfirstapp.adapters;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.learninga_z.myfirstapp.models.Message;
+import com.learninga_z.myfirstapp.R;
+import com.learninga_z.myfirstapp.models.User;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class MessageAdapter extends BaseAdapter {
+    private static final String TAG = "MessageAdapter";
+
     List<Message> messages;
+    Map<String,User> users;
     Context context;
 
-    public MessageAdapter(Context context) {
+    public MessageAdapter(Context context, List<Message> messageList, Map<String,User> userMap) {
         this.context = context;
-        messages = new ArrayList<>();
+        messages = messageList;
+        users = userMap;
     }
 
-    public void add(Message message) {
-        this.messages.add(message);
-        notifyDataSetChanged();
+    private class MessageViewHolder {
+        public View avatar;
+        public TextView name;
+        public TextView messageBody;
     }
 
     @Override
@@ -61,19 +72,14 @@ public class MessageAdapter extends BaseAdapter {
             holder.messageBody = (TextView) convertView.findViewById(R.id.message_body);
             convertView.setTag(holder);
 
-            holder.name.setText(message.getMember().getName());
+            User user = users.get(message.getUserId());
+            holder.name.setText(user == null ? "" : user.getUsername());
             holder.messageBody.setText(message.getText());
 
             GradientDrawable avatarCircle = (GradientDrawable) holder.avatar.getBackground();
-            avatarCircle.setColor(Color.parseColor(message.getMember().getColor()));
+            avatarCircle.setColor(Color.parseColor("#000000"));
         }
 
         return convertView;
     }
-}
-
-class MessageViewHolder {
-    public View avatar;
-    public TextView name;
-    public TextView messageBody;
 }
