@@ -55,4 +55,14 @@ public class Message {
     public void setIsMine(boolean mine) {
         isMine = mine;
     }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "userId='" + userId + '\'' +
+                ", text='" + text + '\'' +
+                ", sentOn=" + sentOn +
+                ", isMine=" + isMine +
+                '}';
+    }
 }

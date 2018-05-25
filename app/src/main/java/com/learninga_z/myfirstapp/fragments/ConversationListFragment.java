@@ -1,5 +1,6 @@
 package com.learninga_z.myfirstapp.fragments;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -34,16 +36,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ConversationListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ConversationListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ConversationListFragment extends Fragment {
-    private static final String TAG = "ConversationListFragmen";
+    private static final String TAG = "ConversationListFrag";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -157,7 +151,7 @@ public class ConversationListFragment extends Fragment {
     }
 
     private void registerFabClickHandler(View view) {
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -186,40 +180,74 @@ public class ConversationListFragment extends Fragment {
     }
 
     private void showProgress() {
-        progressOverlayView.setVisibility(View.VISIBLE);
+        if(progressOverlayView != null && convoList.isEmpty())
+            progressOverlayView.setVisibility(View.VISIBLE);
     }
     private void hideProgress() {
-        progressOverlayView.setVisibility(View.GONE);
+        if(progressOverlayView != null)
+            progressOverlayView.setVisibility(View.GONE);
     }
 
 
     private void listenForConversations() {
         showProgress();
+        convoList.clear();
+
         final ConversationListAdapter conversationListAdapter = new ConversationListAdapter(getActivity(), android.R.layout.simple_selectable_list_item, convoList);
         listView.setAdapter(conversationListAdapter);
+
         conversationListener = conversationsRef
-                .whereEqualTo("users." + currentUser.getUid(),true)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        convoList.clear();
-                        Log.d(TAG, "Loaded data");
-                        hideProgress();
-                        if(documentSnapshots != null) {
-                            for (DocumentSnapshot snapshot : documentSnapshots) {
-                                Conversation conversation = snapshot.toObject(Conversation.class);
+        .whereEqualTo("users." + currentUser.getUid(),true)
+        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
+                hideProgress();
+                if(documentSnapshots != null) {
+                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
+                        Conversation conversation = dc.getDocument().toObject(Conversation.class);
+                        switch (dc.getType()) {
+                            case ADDED:
                                 convoList.add(conversation);
-                                Log.d(TAG, "Adding " + conversation);
-                            }
+                                Log.v(TAG, "Added conversation: " + conversation);
+                                break;
+
+                            case MODIFIED:
+                                int convoIndex = findConversationIndex(conversation);
+                                // if it can't be found, just add it
+                                if(convoIndex == -1)
+                                    convoList.add(conversation);
+                                else
+                                    convoList.set(convoIndex, conversation);
+                                Log.v(TAG, "Modified conversation: " + conversation);
+                                break;
+
+                            case REMOVED:
+                                convoList.remove(conversation);
+                                Log.v(TAG, "Removed conversation: " + conversation);
+                                break;
                         }
-                        sortConversations();
-                        conversationListAdapter.notifyDataSetChanged();
                     }
-                });
+                    sortConversations();
+                }
+                conversationListAdapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private int findConversationIndex(Conversation conversation) {
+        int index = 0;
+        int convoIndex = -1;
+        for(Conversation convo : convoList) {
+            if(convo.equals(conversation)) {
+                convoIndex = index;
+            }
+            index++;
+        }
+        return convoIndex;
     }
 
     private void sortConversations() {
-        Log.d(TAG, "Begin sorting");
+        Log.d(TAG, "Begin sorting list");
         Collections.sort(convoList, new Comparator<Conversation>() {
             public int compare(Conversation c1, Conversation c2) {
                 if(c1.updatedOn == null || c2.updatedOn == null)

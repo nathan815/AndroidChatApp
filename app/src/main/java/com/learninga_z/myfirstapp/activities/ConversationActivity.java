@@ -20,6 +20,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
@@ -67,6 +68,8 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
+
         setContentView(R.layout.activity_conversation);
 
         Intent intent = getIntent();
@@ -96,7 +99,7 @@ public class ConversationActivity extends AppCompatActivity {
         messagesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                hideKeybooard();
+                hideKeyboard();
             }
         });
 
@@ -110,13 +113,19 @@ public class ConversationActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onPause() {
+        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
         conversationListener.remove();
         messageListener.remove();
+        super.onPause();
     }
 
-    private void hideKeybooard() {
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    private void hideKeyboard() {
         sendMessageText.clearFocus();
         InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
@@ -166,23 +175,47 @@ public class ConversationActivity extends AppCompatActivity {
         });
     }
 
+    private void showNoMessages() {
+        findViewById(R.id.conversation_no_messages).setVisibility(View.VISIBLE);
+    }
+    private void hideNoMessages() {
+        findViewById(R.id.conversation_no_messages).setVisibility(View.GONE);
+    }
+
     private void listenForMessages() {
+        messageList.clear();
+        messageAdapter = new MessageAdapter(getApplicationContext(), messageList, userMap);
+        messagesView.setAdapter(messageAdapter);
         messageListener = messagesRef
                 .orderBy("sentOn", Query.Direction.ASCENDING)
                 .addSnapshotListener(new EventListener<QuerySnapshot>() {
                     @Override
                     public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        messageList.clear();
+                        if(documentSnapshots.size() == 0) {
+                            showNoMessages();
+                        }
+                        else {
+                            hideNoMessages();
+                        }
                         if(documentSnapshots != null) {
-                            for (DocumentSnapshot snapshot : documentSnapshots) {
-                                Message message = snapshot.toObject(Message.class);
+                            for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
+                                Message message = dc.getDocument().toObject(Message.class);
                                 message.setIsMine(message.getUserId().equals(currentUser.getUid()));
-                                messageList.add(message);
+                                switch (dc.getType()) {
+                                    case ADDED:
+                                        messageList.add(message);
+                                        Log.v(TAG, "Added message: " + message);
+                                        break;
+                                    case MODIFIED:
+                                        // messages don't get modified
+                                        break;
+                                    case REMOVED:
+                                        // messages don't get removed
+                                        break;
+                                }
                             }
                         }
-                        messageAdapter = new MessageAdapter(getApplicationContext(), messageList, userMap);
                         messageAdapter.notifyDataSetChanged();
-                        messagesView.setAdapter(messageAdapter);
                         messagesView.setSelection(messageAdapter.getCount() - 1);
                     }
                 });

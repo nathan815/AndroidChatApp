@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -20,13 +21,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.learninga_z.myfirstapp.R;
 import com.learninga_z.myfirstapp.fragments.ConversationListFragment;
 import com.learninga_z.myfirstapp.fragments.SettingsFragment;
 import com.learninga_z.myfirstapp.fragments.UsersFragment;
+import com.learninga_z.myfirstapp.models.User;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,
         ConversationListFragment.OnFragmentInteractionListener,
@@ -95,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         txtName = (TextView) navHeader.findViewById(R.id.nav_header_name);
         txtWebsite = (TextView) navHeader.findViewById(R.id.nav_header_email);
 //        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
-//        imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
+        imgProfile = (ImageView) navHeader.findViewById(R.id.nav_header_image);
 
         // load toolbar titles from string resources
         activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
@@ -169,6 +174,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 navItemIndex = 2;
                 currentFragmentTag = FRAGMENT_TAG_SETTINGS;
                 break;
+            case R.id.nav_item_logout:
+                logout();
+                break;
         }
 
         loadSelectedFragment();
@@ -186,8 +194,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         selectNavMenu();
         setToolbarTitle();
 
-        Log.d(TAG, "Loading " + currentFragmentTag);
-
         // if user select the current navigation menu again, don't do anything
         // just close the navigation drawer
         if (getSupportFragmentManager().findFragmentByTag(currentFragmentTag) != null) {
@@ -195,10 +201,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        // Sometimes, when fragment has huge data, screen seems hanging
-        // when switching between navigation menus
-        // So using runnable, the fragment is loaded with cross fade effect
-        // This effect can be seen in GMail app
 //        Runnable pendingRunnable = new Runnable() {
 //            @Override
 //            public void run() {
@@ -250,11 +252,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-
+    private void loadUserInfoToDrawer() {
+        db.collection("users").document(currentUser.getUid())
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()) {
+                    DocumentSnapshot snap = task.getResult();
+                    User user = snap.toObject(User.class);
+                    txtName.setText(user.getUsername());
+                    txtWebsite.setText(user.getEmail());
+//                    imgProfile.setImageURI(Uri.parse("http://via.placeholder.com/90x90"));
+                }
+            }
+        });
+    }
     private void loadNavHeader() {
-        // name, website
-        txtName.setText("Testing");
-        txtWebsite.setText("www.learninga-z.com");
+        loadUserInfoToDrawer();
 
 //        // loading header background image
 //        Glide.with(this).load(urlNavHeaderBg)

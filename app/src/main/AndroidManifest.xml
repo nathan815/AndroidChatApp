@@ -26,9 +26,6 @@
             android:name=".activities.LoginActivity"
             android:label="@string/title_activity_login" />
         <activity
-            android:name=".activities.ConversationListActivity"
-            android:label="My Conversations" />
-        <activity
             android:name=".activities.ConversationActivity"
             android:parentActivityName=".activities.MainActivity">
             <meta-data
@@ -49,7 +46,8 @@
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop" />
     </application>
 
 </manifest>

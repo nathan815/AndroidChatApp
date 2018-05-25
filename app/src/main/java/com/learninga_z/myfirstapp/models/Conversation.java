@@ -51,4 +51,22 @@ public class Conversation {
         }
         return sb.toString().substring(0, 7);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        return this.conversationId.equals( ((Conversation) obj).conversationId );
+    }
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "conversationId='" + conversationId + '\'' +
+                ", name='" + name + '\'' +
+                ", color='" + color + '\'' +
+                ", latestMessage='" + latestMessage + '\'' +
+                ", createdOn=" + createdOn +
+                ", updatedOn=" + updatedOn +
+                ", users=" + users +
+                '}';
+    }
 }

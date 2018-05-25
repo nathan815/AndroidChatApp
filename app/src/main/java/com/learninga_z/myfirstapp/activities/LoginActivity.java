@@ -132,7 +132,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
     private void loginSuccess() {
-        Intent i = new Intent(LoginActivity.this, ConversationListActivity.class);
+        Intent i = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(i);
         finish();
     }

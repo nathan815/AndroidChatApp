@@ -26,9 +26,7 @@ public class LauncherActivity extends Activity {
             return;
         }
 
-        setContentView(R.layout.activity_launcher);
-
-        Log.d(TAG, "Main activity started");
+        Log.d(TAG, "Launcher activity started");
 
         auth = FirebaseAuth.getInstance();
     }

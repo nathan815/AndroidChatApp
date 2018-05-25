@@ -154,7 +154,7 @@ public class CreateAccountActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER, 0, 0);
         toast.show();
 
-        Intent i = new Intent(CreateAccountActivity.this, ConversationListActivity.class);
+        Intent i = new Intent(CreateAccountActivity.this, MainActivity.class);
         startActivity(i);
         finish();
     }
