@@ -233,35 +233,39 @@ public class ConversationListFragment extends Fragment {
             public void onEvent(@Nullable QuerySnapshot documentSnapshots, @Nullable FirebaseFirestoreException e) {
                 hideProgress();
                 if(documentSnapshots != null) {
-                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                        Conversation conversation = dc.getDocument().toObject(Conversation.class);
-                        switch (dc.getType()) {
-                            case ADDED:
-                                convoList.add(conversation);
-                                Log.v(TAG, "Added conversation: " + conversation);
-                                break;
-
-                            case MODIFIED:
-                                int convoIndex = findConversationIndex(conversation);
-                                // if it can't be found, just add it
-                                if(convoIndex == -1)
-                                    convoList.add(conversation);
-                                else
-                                    convoList.set(convoIndex, conversation);
-                                Log.v(TAG, "Modified conversation: " + conversation);
-                                break;
-
-                            case REMOVED:
-                                convoList.remove(conversation);
-                                Log.v(TAG, "Removed conversation: " + conversation);
-                                break;
-                        }
-                    }
+                    processConversationSnapshots(documentSnapshots);
                     sortConversations();
                 }
                 conversationListAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+    private void processConversationSnapshots(QuerySnapshot snapshots) {
+        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+            Conversation conversation = dc.getDocument().toObject(Conversation.class);
+            switch (dc.getType()) {
+                case ADDED:
+                    convoList.add(conversation);
+                    Log.v(TAG, "Added conversation: " + conversation);
+                    break;
+
+                case MODIFIED:
+                    int convoIndex = findConversationIndex(conversation);
+                    // if it can't be found, just add it
+                    if (convoIndex == -1)
+                        convoList.add(conversation);
+                    else
+                        convoList.set(convoIndex, conversation);
+                    Log.v(TAG, "Modified conversation: " + conversation);
+                    break;
+
+                case REMOVED:
+                    convoList.remove(conversation);
+                    Log.v(TAG, "Removed conversation: " + conversation);
+                    break;
+            }
+        }
     }
 
     private int findConversationIndex(Conversation conversation) {

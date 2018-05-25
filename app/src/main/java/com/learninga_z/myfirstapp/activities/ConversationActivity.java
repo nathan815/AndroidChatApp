@@ -37,6 +37,8 @@ import com.learninga_z.myfirstapp.models.Message;
 import com.learninga_z.myfirstapp.models.User;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,8 +48,8 @@ public class ConversationActivity extends AppCompatActivity {
     private final static String TAG = "ConversationActivity";
 
     // UI
-    private ListView messagesView;
-    private EditText sendMessageText;
+    private ListView messagesListView;
+    private EditText sendMessageTextField;
 
     private String conversationId;
 
@@ -79,8 +81,8 @@ public class ConversationActivity extends AppCompatActivity {
         String conversationName = intent != null ? intent.getStringExtra("conversation_name") : "Conversation";
         setTitle(conversationName);
 
-        sendMessageText = findViewById(R.id.send_message_text);
-        messagesView = findViewById(R.id.messages_view);
+        sendMessageTextField = findViewById(R.id.send_message_text);
+        messagesListView = findViewById(R.id.messages_view);
 
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
@@ -97,14 +99,14 @@ public class ConversationActivity extends AppCompatActivity {
             }
         });
 
-        messagesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        messagesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 hideKeyboard();
             }
         });
 
-        sendMessageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        sendMessageTextField.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(!hasFocus) {
@@ -179,13 +181,13 @@ public class ConversationActivity extends AppCompatActivity {
     }
 
     private void scrollToBottom() {
-        messagesView.setSelection(messageAdapter.getCount() - 1);
+        messagesListView.setSelection(messageAdapter.getCount() - 1);
     }
 
     private void hideKeyboard() {
-        sendMessageText.clearFocus();
+        sendMessageTextField.clearFocus();
         InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
+        imm.hideSoftInputFromWindow(sendMessageTextField.getWindowToken(), 0);
     }
 
     private void showNoMessages() {
@@ -214,7 +216,7 @@ public class ConversationActivity extends AppCompatActivity {
     private void listenForMessages() {
         messageList.clear();
         messageAdapter = new MessageAdapter(getApplicationContext(), messageList, userMap);
-        messagesView.setAdapter(messageAdapter);
+        messagesListView.setAdapter(messageAdapter);
         messageListener = messagesRef
         .orderBy("sentOn", Query.Direction.ASCENDING)
         .addSnapshotListener(new EventListener<QuerySnapshot>() {
@@ -238,12 +240,16 @@ public class ConversationActivity extends AppCompatActivity {
             return;
         }
         Timestamp lastTimestamp = null;
+        if(!messageList.isEmpty()) {
+            Message lastMessage = messageList.get(messageList.size()-1);
+            lastTimestamp = lastMessage.getSentOn();
+        }
         for (DocumentChange dc : snapshots.getDocumentChanges()) {
             Message message = dc.getDocument().toObject(Message.class);
             message.setIsMine(message.getUserId().equals(currentUser.getUid()));
 
-            // if this message is a different day from previous, add a message "date header"
-            if(lastTimestamp == null || lastTimestamp.toDate().getDay() != message.getSentOn().toDate().getDay()) {
+            // if this message is a different day from previous message, add a message "date header"
+            if(lastTimestamp == null || !isSameDay(lastTimestamp.toDate(), message.getSentOn().toDate()) ) {
                 messageList.add(new Message(Message.TYPE_DATE_HEADER, null, null, message.getSentOn()));
                 lastTimestamp = message.getSentOn();
             }
@@ -263,8 +269,18 @@ public class ConversationActivity extends AppCompatActivity {
         }
     }
 
-    public void sendMessage() {
-        final String messageText = sendMessageText.getText().toString();
+    private boolean isSameDay(Date date1, Date date2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(date1);
+        cal2.setTime(date2);
+        boolean sameDay = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+        return sameDay;
+    }
+
+    private void sendMessage() {
+        final String messageText = sendMessageTextField.getText().toString();
         if(messageText.length() > 0) {
             Message message = new Message(currentUser.getUid(), messageText);
             DocumentReference doc = messagesRef.document();
@@ -273,7 +289,7 @@ public class ConversationActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Message sent: " + messageText);
-                        sendMessageText.getText().clear();
+                        sendMessageTextField.getText().clear();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
