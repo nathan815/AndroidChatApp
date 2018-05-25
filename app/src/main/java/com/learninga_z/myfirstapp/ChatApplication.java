@@ -15,6 +15,7 @@ public class ChatApplication extends Application {
         // Setup Firebase
         FirebaseApp.initializeApp(this);
         FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
                 .setTimestampsInSnapshotsEnabled(true)
                 .build();
         FirebaseFirestore.getInstance().setFirestoreSettings(settings);
