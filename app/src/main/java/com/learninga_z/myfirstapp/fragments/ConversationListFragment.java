@@ -197,6 +197,7 @@ public class ConversationListFragment extends Fragment {
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
     private void deleteConversation(String conversationId) {
         Log.d(TAG, "Delete " + conversationId);
     }

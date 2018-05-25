@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout drawer;
     private View navHeader;
     private ImageView imgProfile;
-    private TextView txtName, txtWebsite;
+    private TextView nameTextView, emailTextView;
     private Toolbar toolbar;
 
     private View progressOverlayView;
@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Navigation view header
         navHeader = navigationView.getHeaderView(0);
-        txtName = (TextView) navHeader.findViewById(R.id.nav_header_name);
-        txtWebsite = (TextView) navHeader.findViewById(R.id.nav_header_email);
+        nameTextView = (TextView) navHeader.findViewById(R.id.nav_header_name);
+        emailTextView = (TextView) navHeader.findViewById(R.id.nav_header_email);
         imgProfile = (ImageView) navHeader.findViewById(R.id.nav_header_image);
 
         // load toolbar titles from string resources
@@ -122,8 +122,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -182,7 +180,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment fragment = getSelectedFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, fragment, currentFragmentTag);
-        fragmentTransaction.commitAllowingStateLoss();
+        fragmentTransaction.commit();
 
         drawer.closeDrawers();
 
@@ -221,8 +219,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     DocumentSnapshot snap = task.getResult();
                     User user = snap.toObject(User.class);
                     if(user != null) {
-                        txtName.setText(user.getUsername());
-                        txtWebsite.setText(user.getEmail());
+                        nameTextView.setText(user.getUsername());
+                        emailTextView.setText(user.getEmail());
                     }
                 }
             }
