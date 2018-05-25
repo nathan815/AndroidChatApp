@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -103,6 +104,30 @@ public class ConversationActivity extends AppCompatActivity {
             }
         });
 
+        sendMessageText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus) {
+                    return;
+                }
+                // delayed scroll to bottom to allow keyboard to open first
+                new Thread() {
+                    public void run() {
+                        try {
+                            Thread.sleep(500);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    scrollToBottom();
+                                }
+                            });
+                        } catch (InterruptedException e) {
+                        }
+                    }
+                }.start();
+            }
+        });
+
     }
 
     @Override
@@ -123,28 +148,6 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-    }
-
-    private void hideKeyboard() {
-        sendMessageText.clearFocus();
-        InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
-    }
-
-    private void listenForConversationInfo() {
-        conversationListener = conversationRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
-                userMap.clear();
-                if(snapshot != null) {
-                    Log.d(TAG, "conversation updated, snapshot: " + snapshot);
-                    Conversation conversation = snapshot.toObject(Conversation.class);
-                    for (Map.Entry<String, Boolean> item : conversation.getUsers().entrySet()) {
-                        fetchUserInfo(item.getKey());
-                    }
-                }
-            }
-        });
     }
 
     private void fetchUserInfo(final String userId) {
@@ -169,10 +172,20 @@ public class ConversationActivity extends AppCompatActivity {
                 }
                 else {
                     Log.d(TAG, "get user info failed with ", task.getException());
-                    fetchUserInfo(userId); // retry
+                    fetchUserInfo(userId);
                 }
             }
         });
+    }
+
+    private void scrollToBottom() {
+        messagesView.setSelection(messageAdapter.getCount() - 1);
+    }
+
+    private void hideKeyboard() {
+        sendMessageText.clearFocus();
+        InputMethodManager imm =  (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(sendMessageText.getWindowToken(), 0);
     }
 
     private void showNoMessages() {
@@ -180,6 +193,22 @@ public class ConversationActivity extends AppCompatActivity {
     }
     private void hideNoMessages() {
         findViewById(R.id.conversation_no_messages).setVisibility(View.GONE);
+    }
+
+    private void listenForConversationInfo() {
+        conversationListener = conversationRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+            @Override
+            public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
+                userMap.clear();
+                if(snapshot != null) {
+                    Log.d(TAG, "conversation updated, snapshot: " + snapshot);
+                    Conversation conversation = snapshot.toObject(Conversation.class);
+                    for (Map.Entry<String, Boolean> item : conversation.getUsers().entrySet()) {
+                        fetchUserInfo(item.getKey());
+                    }
+                }
+            }
+        });
     }
 
     private void listenForMessages() {
@@ -196,29 +225,42 @@ public class ConversationActivity extends AppCompatActivity {
                 }
                 else {
                     hideNoMessages();
-                }
-                if(documentSnapshots != null) {
-                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                        Message message = dc.getDocument().toObject(Message.class);
-                        message.setIsMine(message.getUserId().equals(currentUser.getUid()));
-                        switch (dc.getType()) {
-                            case ADDED:
-                                messageList.add(message);
-                                Log.v(TAG, "Added message: " + message);
-                                break;
-                            case MODIFIED:
-                                // messages don't get modified
-                                break;
-                            case REMOVED:
-                                // messages don't get removed
-                                break;
-                        }
-                    }
+                    processMessageSnapshots(documentSnapshots);
                 }
                 messageAdapter.notifyDataSetChanged();
-                messagesView.setSelection(messageAdapter.getCount() - 1);
+                scrollToBottom();
             }
         });
+    }
+
+    private void processMessageSnapshots(QuerySnapshot snapshots) {
+        if(snapshots == null) {
+            return;
+        }
+        Timestamp lastTimestamp = null;
+        for (DocumentChange dc : snapshots.getDocumentChanges()) {
+            Message message = dc.getDocument().toObject(Message.class);
+            message.setIsMine(message.getUserId().equals(currentUser.getUid()));
+
+            // if this message is a different day from previous, add a message "date header"
+            if(lastTimestamp == null || lastTimestamp.toDate().getDay() != message.getSentOn().toDate().getDay()) {
+                messageList.add(new Message(Message.TYPE_DATE_HEADER, null, null, message.getSentOn()));
+                lastTimestamp = message.getSentOn();
+            }
+
+            switch (dc.getType()) {
+                case ADDED:
+                    messageList.add(message);
+                    Log.v(TAG, "Added message: " + message);
+                    break;
+                case MODIFIED:
+                    // messages don't get modified
+                    break;
+                case REMOVED:
+                    // messages don't get removed
+                    break;
+            }
+        }
     }
 
     public void sendMessage() {

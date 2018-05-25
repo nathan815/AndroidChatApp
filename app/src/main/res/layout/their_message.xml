@@ -38,4 +38,13 @@
         android:textSize="18dp"
         android:text="How are you doing? This is a long message that should probably wrap."
         />
+
+    <include
+        layout="@layout/message_timestamp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/message_body"
+        android:layout_marginLeft="50dp" />
+
+
 </RelativeLayout>

@@ -27,7 +27,8 @@
             android:label="@string/title_activity_login" />
         <activity
             android:name=".activities.ConversationActivity"
-            android:parentActivityName=".activities.MainActivity">
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activities.MainActivity" />

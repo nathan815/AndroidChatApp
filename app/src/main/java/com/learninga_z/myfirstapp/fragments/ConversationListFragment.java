@@ -1,13 +1,14 @@
 package com.learninga_z.myfirstapp.fragments;
 
-import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -170,6 +170,35 @@ public class ConversationListFragment extends Fragment {
                 openConversation(conversation);
             }
         });
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                Conversation conversation = convoList.get(position);
+                askToDelete(conversation);
+                return true;
+            }
+        });
+    }
+
+    private void askToDelete(final Conversation conversation) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(getResources().getString(R.string.dialog_delete_conversation_message, conversation.name))
+                .setTitle(R.string.dialog_delete_conversation_title);
+        builder.setPositiveButton(R.string.dialog_delete_conversation_ok, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+               deleteConversation(conversation.conversationId);
+            }
+        });
+        builder.setNegativeButton(R.string.dialog_delete_conversation_cancel, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+    private void deleteConversation(String conversationId) {
+        Log.d(TAG, "Delete " + conversationId);
     }
 
     private void openConversation(Conversation conversation) {

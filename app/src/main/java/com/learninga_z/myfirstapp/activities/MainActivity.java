@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -14,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private DrawerLayout drawer;
     private View navHeader;
-    private ImageView imgNavHeaderBg, imgProfile;
+    private ImageView imgProfile;
     private TextView txtName, txtWebsite;
     private Toolbar toolbar;
 
@@ -99,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navHeader = navigationView.getHeaderView(0);
         txtName = (TextView) navHeader.findViewById(R.id.nav_header_name);
         txtWebsite = (TextView) navHeader.findViewById(R.id.nav_header_email);
-//        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
         imgProfile = (ImageView) navHeader.findViewById(R.id.nav_header_image);
 
         // load toolbar titles from string resources
@@ -142,12 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        Log.d(TAG, "Clicked " + id);
-
-        switch(id) {
+        switch(item.getItemId()) {
             case R.id.nav_item_conversation_list:
                 navItemIndex = 0;
                 currentFragmentTag = FRAGMENT_TAG_CONVO_LIST;
@@ -177,39 +169,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * selected from navigation menu
      */
     private void loadSelectedFragment() {
-        selectNavMenu();
+        selectNavMenuItem();
         setToolbarTitle();
 
-        // if user select the current navigation menu again, don't do anything
+        // if user selects the current navigation menu
         // just close the navigation drawer
         if (getSupportFragmentManager().findFragmentByTag(currentFragmentTag) != null) {
             drawer.closeDrawers();
             return;
         }
 
-//        Runnable pendingRunnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                // update the main content by replacing fragments
-//                Fragment fragment = getSelectedFragment();
-//                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-//                fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
-//                        android.R.anim.fade_out);
-//                fragmentTransaction.replace(R.id.content_frame, fragment, currentFragmentTag);
-//                fragmentTransaction.commitAllowingStateLoss();
-//            }
-//        };
-//
-//        // If pendingRunnable is not null, then add to the message queue
-//        if (pendingRunnable != null) {
-//            handler.post(pendingRunnable);
-//        }
         Fragment fragment = getSelectedFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.content_frame, fragment, currentFragmentTag);
         fragmentTransaction.commitAllowingStateLoss();
 
-        // Closing drawer on item click
         drawer.closeDrawers();
 
         // refresh toolbar menu
@@ -221,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportActionBar().setTitle(title);
     }
 
-    private void selectNavMenu() {
+    private void selectNavMenuItem() {
         navigationView.getMenu().getItem(navItemIndex).setChecked(true);
     }
 
