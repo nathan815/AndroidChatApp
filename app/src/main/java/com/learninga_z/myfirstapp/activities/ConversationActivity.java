@@ -187,38 +187,38 @@ public class ConversationActivity extends AppCompatActivity {
         messageAdapter = new MessageAdapter(getApplicationContext(), messageList, userMap);
         messagesView.setAdapter(messageAdapter);
         messageListener = messagesRef
-                .orderBy("sentOn", Query.Direction.ASCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
-                        if(documentSnapshots.size() == 0) {
-                            showNoMessages();
+        .orderBy("sentOn", Query.Direction.ASCENDING)
+        .addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(QuerySnapshot documentSnapshots, FirebaseFirestoreException e) {
+                if(documentSnapshots.size() == 0) {
+                    showNoMessages();
+                }
+                else {
+                    hideNoMessages();
+                }
+                if(documentSnapshots != null) {
+                    for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
+                        Message message = dc.getDocument().toObject(Message.class);
+                        message.setIsMine(message.getUserId().equals(currentUser.getUid()));
+                        switch (dc.getType()) {
+                            case ADDED:
+                                messageList.add(message);
+                                Log.v(TAG, "Added message: " + message);
+                                break;
+                            case MODIFIED:
+                                // messages don't get modified
+                                break;
+                            case REMOVED:
+                                // messages don't get removed
+                                break;
                         }
-                        else {
-                            hideNoMessages();
-                        }
-                        if(documentSnapshots != null) {
-                            for (DocumentChange dc : documentSnapshots.getDocumentChanges()) {
-                                Message message = dc.getDocument().toObject(Message.class);
-                                message.setIsMine(message.getUserId().equals(currentUser.getUid()));
-                                switch (dc.getType()) {
-                                    case ADDED:
-                                        messageList.add(message);
-                                        Log.v(TAG, "Added message: " + message);
-                                        break;
-                                    case MODIFIED:
-                                        // messages don't get modified
-                                        break;
-                                    case REMOVED:
-                                        // messages don't get removed
-                                        break;
-                                }
-                            }
-                        }
-                        messageAdapter.notifyDataSetChanged();
-                        messagesView.setSelection(messageAdapter.getCount() - 1);
                     }
-                });
+                }
+                messageAdapter.notifyDataSetChanged();
+                messagesView.setSelection(messageAdapter.getCount() - 1);
+            }
+        });
     }
 
     public void sendMessage() {
