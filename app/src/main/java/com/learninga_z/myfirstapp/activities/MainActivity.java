@@ -126,15 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
     }
 
-    @Override
-    public void onBackPressed() {
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        if (drawer.isDrawerOpen(GravityCompat.START)) {
-//            drawer.closeDrawer(GravityCompat.START);
-//        } else {
-//            super.onBackPressed();
-//        }
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -145,15 +137,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) {
-            case R.id.menu_action_settings:
-                Snackbar.make(getWindow().getDecorView(), "Settings!", Snackbar.LENGTH_LONG).show();
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -260,32 +246,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(task.isSuccessful()) {
                     DocumentSnapshot snap = task.getResult();
                     User user = snap.toObject(User.class);
-                    txtName.setText(user.getUsername());
-                    txtWebsite.setText(user.getEmail());
-//                    imgProfile.setImageURI(Uri.parse("http://via.placeholder.com/90x90"));
+                    if(user != null) {
+                        txtName.setText(user.getUsername());
+                        txtWebsite.setText(user.getEmail());
+                    }
                 }
             }
         });
     }
+
     private void loadNavHeader() {
         loadUserInfoToDrawer();
-
-//        // loading header background image
-//        Glide.with(this).load(urlNavHeaderBg)
-//                .crossFade()
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(imgNavHeaderBg);
-//
-//        // Loading profile image
-//        Glide.with(this).load(urlProfileImg)
-//                .crossFade()
-//                .thumbnail(0.5f)
-//                .bitmapTransform(new CircleTransform(this))
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(imgProfile);
-
-        // showing dot next to notifications label
-        //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
     private void logout() {
