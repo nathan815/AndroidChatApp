@@ -52,6 +52,7 @@ public class ConversationActivity extends AppCompatActivity {
     private EditText sendMessageTextField;
 
     private String conversationId;
+    private Conversation conversation;
 
     private CollectionReference usersRef;
     private DocumentReference conversationRef;
@@ -76,10 +77,12 @@ public class ConversationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_conversation);
 
         Intent intent = getIntent();
-        conversationId = intent != null ? intent.getStringExtra("conversation_id") : "";
+        conversation = intent != null ? (Conversation) intent.getParcelableExtra("conversation") : null;
+        if(conversation != null) {
+            conversationId = conversation.conversationId;
+        }
 
-        String conversationName = intent != null ? intent.getStringExtra("conversation_name") : "Conversation";
-        setTitle(conversationName);
+        setTitle(conversation.name);
 
         sendMessageTextField = findViewById(R.id.send_message_text);
         messagesListView = findViewById(R.id.messages_view);
@@ -152,15 +155,19 @@ public class ConversationActivity extends AppCompatActivity {
         super.onStop();
     }
 
-    private void fetchUserInfo(final String userId) {
+    private void fetchUserInfo(final String userId, final int retries) {
         Log.d(TAG, "fetchUserInfo: fetching "+userId);
+        final int maxRetries = 5;
+        if(retries > maxRetries) {
+            Log.w(TAG, "fetchUserInfo: max retries exceeded for user " + userId);
+            return;
+        }
         usersRef.document(userId).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Log.d(TAG, "User data: " + document.getData());
                         User user = document.toObject(User.class);
                         userMap.put(userId, user);
 
@@ -169,15 +176,18 @@ public class ConversationActivity extends AppCompatActivity {
                             messageAdapter.notifyDataSetChanged();
                     }
                     else {
-                        Log.d(TAG, "No such user " + userId);
+                        Log.w(TAG, "fetchUserInfo: No such user " + userId);
                     }
                 }
                 else {
-                    Log.d(TAG, "get user info failed with ", task.getException());
-                    fetchUserInfo(userId);
+                    Log.w(TAG, "fetchUserInfo: get user info failed with ", task.getException());
+                    fetchUserInfo(userId, retries + 1);
                 }
             }
         });
+    }
+    private void fetchUserInfo(String userId) {
+        fetchUserInfo(userId, 0);
     }
 
     private void scrollToBottom() {
@@ -203,10 +213,10 @@ public class ConversationActivity extends AppCompatActivity {
             public void onEvent(DocumentSnapshot snapshot, FirebaseFirestoreException e) {
                 userMap.clear();
                 if(snapshot != null) {
-                    Log.d(TAG, "conversation updated, snapshot: " + snapshot);
+                    Log.d(TAG, "conversation info fetched, snapshot: " + snapshot);
                     Conversation conversation = snapshot.toObject(Conversation.class);
-                    for (Map.Entry<String, Boolean> item : conversation.getUsers().entrySet()) {
-                        fetchUserInfo(item.getKey());
+                    for (String userId : conversation.getUsers().keySet()) {
+                        fetchUserInfo(userId);
                     }
                 }
             }

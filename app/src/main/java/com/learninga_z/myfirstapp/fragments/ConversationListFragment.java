@@ -186,7 +186,7 @@ public class ConversationListFragment extends Fragment {
                 .setTitle(R.string.dialog_delete_conversation_title);
         builder.setPositiveButton(R.string.dialog_delete_conversation_ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-               deleteConversation(conversation.conversationId);
+               deleteConversation(conversation);
             }
         });
         builder.setNegativeButton(R.string.dialog_delete_conversation_cancel, new DialogInterface.OnClickListener() {
@@ -198,14 +198,15 @@ public class ConversationListFragment extends Fragment {
         dialog.show();
     }
 
-    private void deleteConversation(String conversationId) {
-        Log.d(TAG, "Delete " + conversationId);
+    private void deleteConversation(final Conversation conversation) {
+        conversation.deleteForUser(currentUser.getUid());
+        conversationsRef.document(conversation.conversationId).set(conversation);
+        Log.d(TAG, "Deleted " + conversation);
     }
 
     private void openConversation(Conversation conversation) {
         Intent intent = new Intent(getActivity(), ConversationActivity.class);
-        intent.putExtra("conversation_id", conversation.conversationId);
-        intent.putExtra("conversation_name", conversation.name);
+        intent.putExtra("conversation", conversation);
         startActivity(intent);
     }
 
