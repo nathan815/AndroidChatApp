@@ -7,14 +7,10 @@ import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.learninga_z.myfirstapp.R;
 
 public class LauncherActivity extends Activity {
 
     private static final String TAG = "LauncherActivity";
-
-
-    private FirebaseAuth auth;
 
 
     @Override
@@ -25,14 +21,15 @@ public class LauncherActivity extends Activity {
             finish();
             return;
         }
-
-        Log.d(TAG, "Launcher activity started");
-
-        auth = FirebaseAuth.getInstance();
     }
 
     @Override
     protected void onStart() {
+
+        Log.d(TAG, "Launcher activity started");
+
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
         super.onStart();
 
         boolean logout = getIntent().getBooleanExtra("logout", false);
