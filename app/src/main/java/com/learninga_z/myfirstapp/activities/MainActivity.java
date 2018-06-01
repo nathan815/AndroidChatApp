@@ -243,4 +243,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void onFragmentInteraction(Uri uri) {
 
     }
+
+    @Override
+    public void onFragmentInteraction() {
+
+    }
 }

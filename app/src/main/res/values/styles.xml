@@ -20,6 +20,7 @@
     <style name="Theme.Splash" parent="android:Theme">
         <item name="android:background">@color/colorPrimaryDark</item>
         <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
     </style>
 
 </resources>
